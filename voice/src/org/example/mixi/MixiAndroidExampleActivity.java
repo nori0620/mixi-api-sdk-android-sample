@@ -1,6 +1,9 @@
 
 package org.example.mixi;
 
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +22,8 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -39,7 +44,7 @@ import android.widget.Toast;
 public class MixiAndroidExampleActivity extends Activity implements OnItemClickListener {
 
     /** Consumer Key (登録したアプリケーションの Consumer Key を設定) */
-    private static final String CLIENT_ID = "";
+    private static final String CLIENT_ID = "2e3cabea5afbdffd7710";
 
     /** このアプリケーションで認可を求めるパーミッション */
     private static final String[] PERMISSIONS = new String[] {
@@ -305,7 +310,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
                         MixiVoice voice = new MixiVoice();
                         voice.text = item.getString("text");
                         voice.screenName = user.getString("screen_name");
-
+                        voice.profileImageURL = user.getString("profile_image_url");
                         voices.add(voice);
                     }
                 } catch (JSONException e) {
@@ -400,13 +405,13 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
      */
     public static class MixiVoiceListAdapter extends ArrayAdapter<MixiVoice> {
         public MixiVoiceListAdapter(Context context, List<MixiVoice> list) {
-            super(context, android.R.layout.simple_list_item_2, android.R.id.text1, list);
+            super(context, R.layout.voicelist, android.R.id.text1, list);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // リストの1行を展開する際に呼び出されるので、
-            // レイアウト上 (ここでは simple_list_item_2.xml 上) の要素にセットする
+            // レイアウト上 (ここでは voicelist.xml 上) の要素にセットする
             View view = super.getView(position, convertView, parent);
 
             TextView text1 = (TextView) view.findViewById(android.R.id.text1);
@@ -427,8 +432,19 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
      */
     public static class MixiVoice {
         public String text;
-
         public String screenName;
+        public String profileImageURL;
+        public Bitmap getProfileImage() {
+            try {
+                URL url = new URL(this.profileImageURL);
+                InputStream is = url.openStream();
+                Bitmap bm = BitmapFactory.decodeStream(is);
+                return bm;
+            } catch ( Exception e ){
+               // TODO:SAKAMOTO -> Logにエラー出すように.
+                return null;
+            }
+        }
     }
 
     /**
@@ -447,7 +463,8 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
         } else {
             // つぶやきが押された: Toast で本文を表示してみる
             MixiVoice voice = (MixiVoice) listView.getItemAtPosition(position);
-            showToast(voice.text);
+//            showToast(voice.text);
+            showToast( voice.getProfileImage().toString() );
         }
     }
 }
