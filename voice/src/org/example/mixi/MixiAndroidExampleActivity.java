@@ -24,14 +24,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +48,7 @@ import android.widget.Toast;
 public class MixiAndroidExampleActivity extends Activity implements OnItemClickListener {
 
     /** Consumer Key (登録したアプリケーションの Consumer Key を設定) */
-    private static final String CLIENT_ID = "2e3cabea5afbdffd7710";
+    private static final String CLIENT_ID = "";
 
     /** このアプリケーションで認可を求めるパーミッション */
     private static final String[] PERMISSIONS = new String[] {
@@ -62,6 +66,8 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrameLayout frameLayout = new FrameLayout(this);
+        frameLayout.setBackgroundColor(Color.GRAY);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.main);
 
@@ -416,10 +422,15 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
 
             TextView text1 = (TextView) view.findViewById(android.R.id.text1);
             TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+            
+            // SAKAMOTO:MEMO -> ImageViewはsrcに何かいれとかないと死ぬ.
+            ImageView profileImage = (ImageView) view.findViewById(R.id.profileImage);
 
             MixiVoice item = getItem(position);
             text1.setText(item.screenName);
             text2.setText(item.text);
+            Bitmap bm = item.getProfileImage();
+            profileImage.setImageBitmap( bm );
 
             return view;
         }
@@ -441,7 +452,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
                 Bitmap bm = BitmapFactory.decodeStream(is);
                 return bm;
             } catch ( Exception e ){
-               // TODO:SAKAMOTO -> Logにエラー出すように.
+                Log.v("SAKAMOTO",e.toString() );
                 return null;
             }
         }
