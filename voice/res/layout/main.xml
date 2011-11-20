@@ -13,6 +13,31 @@
         android:text="ログイン" />
 
     <LinearLayout
+        android:id="@+id/owner_profile_area"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+    >
+	    <ImageView 
+		    android:id="@+id/owner_profile_image"
+		    android:layout_width="40sp"
+		    android:layout_height="40sp"
+		    android:src="@drawable/icon"
+	    />
+       <TextView android:id="@+id/owner_profile_nickname"
+            android:layout_width="fill_parent"
+            android:layout_height="40sp"
+            android:layout_marginLeft="6dip"
+            android:layout_marginTop="6dip"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:text="aaaa"
+        /> 
+        
+    </LinearLayout> 
+    
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >

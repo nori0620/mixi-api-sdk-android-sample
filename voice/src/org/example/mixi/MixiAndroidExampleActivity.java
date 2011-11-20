@@ -228,6 +228,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
     protected void onInitialized() {
         // ログインボタンを無効化
         findViewById(R.id.loginButton).setEnabled(false);
+        findViewById(R.id.loginButton).setVisibility(View.GONE);
 
         // 投稿ボタンを有効にする
         setPostFormEnabled(true);
@@ -237,6 +238,18 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
 
         // ボイスを読み込む
         loadVoice(0);
+    }
+    
+    /** profile情報を表示する **/
+    protected void renderOwnerProfile(String nickname, String thumbnailURL) {
+        View profileArea = (View) findViewById(R.id.owner_profile_area);
+        TextView nicknameArea = (TextView) findViewById(R.id.owner_profile_nickname);
+        ImageView  thumbnailArea = (ImageView) findViewById(R.id.owner_profile_image);
+        Bitmap profileBM = getImageFromUrl( thumbnailURL );
+        nicknameArea.setText(nickname);
+        thumbnailArea.setImageBitmap( profileBM );
+        profileArea.setVisibility(View.VISIBLE);
+        
     }
 
     MixiVoiceListAdapter mListAdapter = null;
@@ -263,6 +276,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
 
             // ListAdapter を新規に作って、 ListView にセットする
             mListAdapter = new MixiVoiceListAdapter(this, voices);
+            
             listView.setAdapter(mListAdapter);
         } else {
             // 既存のアダプタへ追加する
@@ -363,6 +377,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
                 // response の中に、取得結果の JSON が入っています
                 String result = values.getString("response");
                 String nickname;
+                String thumbnailURL;
 
                 // 結果の JSON を解析してプロフィール情報を取り出す
                 try {
@@ -370,12 +385,13 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
 
                     JSONObject entry = json.getJSONObject("entry");
                     nickname = entry.optString("displayName");
+                    thumbnailURL = entry.optString("thumbnailUrl");
                 } catch (JSONException e) {
                     showToast("レスポンスのJSONを解析できませんでした");
                     return;
                 }
-
-                setTitle(nickname);
+                renderOwnerProfile( nickname, thumbnailURL);
+                setTitle("ログイン中");
             }
 
             @Override
@@ -394,6 +410,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
             }
         });
     }
+
 
     /**
      * 画面上に指定されたメッセージの Toast を表示する　
@@ -456,6 +473,7 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
                 return null;
             }
         }
+        
     }
 
     /**
@@ -478,4 +496,17 @@ public class MixiAndroidExampleActivity extends Activity implements OnItemClickL
             showToast( voice.getProfileImage().toString() );
         }
     }
+    
+    private Bitmap getImageFromUrl( String urlString ){
+        try {
+            URL url = new URL( urlString );
+            InputStream is = url.openStream();
+            Bitmap bm = BitmapFactory.decodeStream(is);
+            return bm;
+        } catch ( Exception e ){
+            Log.v("SAKAMOTO",e.toString() );
+            return null;
+        }
+    }
+    
 }
